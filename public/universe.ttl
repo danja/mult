@@ -1,0 +1,188 @@
+@prefix ex: <http://example.org/multiverse/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix mv: <http://example.org/multiverse/vocab/> .
+
+# Vocabulary definitions
+mv:Universe a rdfs:Class ;
+    rdfs:label "Universe" ;
+    rdfs:comment "A universe/layer in the multiverse" .
+
+mv:Character a rdfs:Class ;
+    rdfs:label "Character" ;
+    rdfs:comment "A character entity in the multiverse" .
+
+mv:Movie a rdfs:Class ;
+    rdfs:label "Movie" ;
+    rdfs:comment "A movie/film entity in the multiverse" .
+
+mv:appearsIn a rdf:Property ;
+    rdfs:label "appears in" ;
+    rdfs:comment "Indicates that an entity appears in a movie/film" .
+
+mv:cameoIn a rdf:Property ;
+    rdfs:label "cameo in" ;
+    rdfs:comment "Indicates that an entity has a cameo appearance in a movie/film" .
+
+mv:belongsToUniverse a rdf:Property ;
+    rdfs:label "belongs to universe" ;
+    rdfs:comment "Indicates which universe an entity belongs to" .
+
+mv:hasPosition a rdf:Property ;
+    rdfs:label "has position" ;
+    rdfs:comment "3D position coordinates for visualization" .
+
+mv:hasColor a rdf:Property ;
+    rdfs:label "has color" ;
+    rdfs:comment "Visual color representation" .
+
+mv:hasHeight a rdf:Property ;
+    rdfs:label "has height" ;
+    rdfs:comment "Y-coordinate height for layer positioning" .
+
+mv:hasSubtitle a rdf:Property ;
+    rdfs:label "has subtitle" ;
+    rdfs:comment "Additional descriptive text" .
+
+mv:connectsTo a rdf:Property ;
+    rdfs:label "connects to" ;
+    rdfs:comment "Cross-universe connection between entities" .
+
+# Universe definitions
+ex:MCU a mv:Universe ;
+    rdfs:label "MCU" ;
+    mv:hasColor "0xff3b30"^^xsd:string ;
+    mv:hasHeight "0"^^xsd:float .
+
+ex:SSU a mv:Universe ;
+    rdfs:label "SSU" ;
+    mv:hasColor "0x0a84ff"^^xsd:string ;
+    mv:hasHeight "4.5"^^xsd:float .
+
+ex:Raimi a mv:Universe ;
+    rdfs:label "Raimi" ;
+    mv:hasColor "0xbf5af2"^^xsd:string ;
+    mv:hasHeight "9"^^xsd:float .
+
+ex:ASM a mv:Universe ;
+    rdfs:label "ASM" ;
+    mv:hasColor "0xff9f0a"^^xsd:string ;
+    mv:hasHeight "13.5"^^xsd:float .
+
+ex:Fox a mv:Universe ;
+    rdfs:label "Fox/Deadpool" ;
+    mv:hasColor "0x34c759"^^xsd:string ;
+    mv:hasHeight "18"^^xsd:float .
+
+ex:Animated a mv:Universe ;
+    rdfs:label "Animated Spider-Verse" ;
+    mv:hasColor "0x64d2ff"^^xsd:string ;
+    mv:hasHeight "22.5"^^xsd:float .
+
+# Character entities
+ex:PeterParker_MCU a mv:Character ;
+    rdfs:label "Peter Parker" ;
+    mv:belongsToUniverse ex:MCU ;
+    mv:hasPosition "0,0,0"^^xsd:string ;
+    mv:hasSubtitle "Tom Holland" .
+
+ex:PeterParker_Raimi a mv:Character ;
+    rdfs:label "Peter Parker" ;
+    mv:belongsToUniverse ex:Raimi ;
+    mv:hasPosition "0,9,0"^^xsd:string ;
+    mv:hasSubtitle "Tobey Maguire" .
+
+ex:PeterParker_ASM a mv:Character ;
+    rdfs:label "Peter Parker" ;
+    mv:belongsToUniverse ex:ASM ;
+    mv:hasPosition "0,13.5,0"^^xsd:string ;
+    mv:hasSubtitle "Andrew Garfield" .
+
+ex:MilesMorales a mv:Character ;
+    rdfs:label "Miles Morales" ;
+    mv:belongsToUniverse ex:Animated ;
+    mv:hasPosition "-3.5,22.5,2.5"^^xsd:string .
+
+ex:GwenStacy_Spider a mv:Character ;
+    rdfs:label "Gwen Stacy (Spider-Gwen)" ;
+    mv:belongsToUniverse ex:Animated ;
+    mv:hasPosition "3.5,22.5,2.5"^^xsd:string .
+
+ex:Venom a mv:Character ;
+    rdfs:label "Eddie Brock / Venom" ;
+    mv:belongsToUniverse ex:SSU ;
+    mv:hasPosition "-3.5,4.5,-2"^^xsd:string .
+
+ex:Morbius a mv:Character ;
+    rdfs:label "Michael Morbius" ;
+    mv:belongsToUniverse ex:SSU ;
+    mv:hasPosition "3.5,4.5,-2"^^xsd:string .
+
+ex:Deadpool a mv:Character ;
+    rdfs:label "Wade Wilson (Deadpool)" ;
+    mv:belongsToUniverse ex:Fox ;
+    mv:hasPosition "-2.5,18,2"^^xsd:string .
+
+ex:Wolverine a mv:Character ;
+    rdfs:label "Logan (Wolverine)" ;
+    mv:belongsToUniverse ex:Fox ;
+    mv:hasPosition "2.5,18,2"^^xsd:string .
+
+ex:AdrianToomes a mv:Character ;
+    rdfs:label "Adrian Toomes (Vulture)" ;
+    mv:belongsToUniverse ex:MCU ;
+    mv:hasPosition "-2,0,-2.8"^^xsd:string .
+
+# Movie entities
+ex:NWH a mv:Movie ;
+    rdfs:label "No Way Home" ;
+    mv:belongsToUniverse ex:MCU ;
+    mv:hasPosition "-6,0,1.6"^^xsd:string .
+
+ex:Raimi2 a mv:Movie ;
+    rdfs:label "Spider-Man 2" ;
+    mv:belongsToUniverse ex:Raimi ;
+    mv:hasPosition "6,9,1.2"^^xsd:string .
+
+ex:ASM2 a mv:Movie ;
+    rdfs:label "ASM 2" ;
+    mv:belongsToUniverse ex:ASM ;
+    mv:hasPosition "-6,13.5,1.2"^^xsd:string .
+
+ex:VenomFilm a mv:Movie ;
+    rdfs:label "Venom" ;
+    mv:belongsToUniverse ex:SSU ;
+    mv:hasPosition "-6,4.5,-1"^^xsd:string .
+
+ex:MorbiusFilm a mv:Movie ;
+    rdfs:label "Morbius" ;
+    mv:belongsToUniverse ex:SSU ;
+    mv:hasPosition "6,4.5,-1"^^xsd:string .
+
+ex:DandW a mv:Movie ;
+    rdfs:label "Deadpool & Wolverine" ;
+    mv:belongsToUniverse ex:Fox ;
+    mv:hasPosition "0,18,-1.4"^^xsd:string .
+
+ex:Across a mv:Movie ;
+    rdfs:label "Across the Spider-Verse" ;
+    mv:belongsToUniverse ex:Animated ;
+    mv:hasPosition "0,22.5,-1.4"^^xsd:string .
+
+# Relationships
+ex:PeterParker_MCU mv:appearsIn ex:NWH .
+ex:PeterParker_Raimi mv:appearsIn ex:Raimi2 .
+ex:PeterParker_ASM mv:appearsIn ex:ASM2 .
+ex:Venom mv:appearsIn ex:VenomFilm .
+ex:Morbius mv:appearsIn ex:MorbiusFilm .
+ex:Deadpool mv:appearsIn ex:DandW .
+ex:Wolverine mv:appearsIn ex:DandW .
+ex:MilesMorales mv:appearsIn ex:Across .
+ex:GwenStacy_Spider mv:appearsIn ex:Across .
+ex:AdrianToomes mv:appearsIn ex:NWH .
+ex:AdrianToomes mv:cameoIn ex:MorbiusFilm .
+
+# Cross-universe connections (shared entities)
+ex:PeterParker_MCU mv:connectsTo ex:PeterParker_Raimi .
+ex:PeterParker_MCU mv:connectsTo ex:PeterParker_ASM .

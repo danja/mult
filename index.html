@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="viewport-fit=cover,width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    <title>RDF Multiverse Visualization</title>
+  </head>
+  <body>
+    <div id="canvas-container"></div>
+    
+    <div id="info">
+      <div id="info-header">
+        <h3 class="title">RDF Multiverse (Modern)</h3>
+        <button id="collapseBtn" class="btn" aria-pressed="false">▾</button>
+      </div>
+      <div id="info-content">
+        <div class="button-group">
+          <button id="animBtn" class="btn" aria-pressed="true">⏯️ Anim</button>
+          <button id="labelsBtn" class="btn" data-mode="smart" aria-pressed="true">🏷️ Labels: Smart</button>
+          <button id="topBtn" class="btn">⌂ Top</button>
+          <button id="resetBtn" class="btn">🎯 Reset</button>
+          <button id="perfBtn" class="btn" aria-pressed="true">⚡ Perf</button>
+        </div>
+        <p class="help-text"><b>Touch:</b> 1-finger orbit • 2-finger pinch to zoom.</p>
+        <div class="layer-legend"></div>
+        <label class="checkbox-label">
+          <input type="checkbox" id="toggle-vertical" checked/> 
+          <span>Show shared connectors</span>
+        </label>
+        <div id="data-stats" class="data-stats"></div>
+      </div>
+    </div>
+
+    <div id="tooltip"></div>
+    <div id="loading" class="loading">
+      <div class="loading-spinner"></div>
+      <p>Loading RDF data...</p>
+    </div>
+    
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
