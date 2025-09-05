@@ -2,6 +2,12 @@
 
 A modern, interactive 3D visualization tool for exploring RDF data representing a multiverse of interconnected entities. Built with TypeScript, Three.js, and RDF-Ext, this application provides an immersive way to navigate and understand complex relationship graphs.
 
+## 🚀 **Live Demo**
+
+**[View Live Demo →](https://danja.github.io/mult/)**
+
+The visualization is automatically deployed to GitHub Pages from the main branch.
+
 ![RDF Multiverse Visualization](https://via.placeholder.com/800x400/0f172a/64d2ff?text=RDF+Multiverse+Visualization)
 
 ## 🌟 Features
@@ -12,9 +18,11 @@ A modern, interactive 3D visualization tool for exploring RDF data representing 
 - **Curved Edge Relationships**: Bezier curves connecting related entities with animated labels
 - **Cross-Universe Connections**: Vertical columns showing shared entities across different universes
 
-### 🎮 **Intuitive Controls**
-- **Touch-Optimized**: Native support for mobile touch gestures (orbit with 1 finger, zoom with 2 fingers)
-- **Smart Camera Controls**: Smooth orbital camera movement with constraints to prevent flipping
+### 🎮 **Multi-Modal Input Controls**
+- **Touch Controls**: 1-finger orbit • 2-finger pinch to zoom
+- **Mouse Controls**: Click & drag to orbit • Wheel to zoom  
+- **Keyboard Controls**: Arrow keys orbit • Page Up/Down zoom • Home/End fast zoom
+- **Smart Camera**: Smooth orbital movement with constraints to prevent flipping
 - **Multiple View Modes**: Top-down view, reset to default, and free exploration
 
 ### 🏷️ **Advanced Labeling System**
@@ -74,9 +82,29 @@ A modern, interactive 3D visualization tool for exploring RDF data representing 
 # Build the application
 npm run build
 
+# Build for GitHub Pages deployment
+npm run build:gh-pages
+
 # Preview the production build
 npm run preview
 ```
+
+## 📦 **Deployment**
+
+### GitHub Pages (Automatic)
+
+The project is configured for automatic deployment to GitHub Pages:
+
+1. **Push to main branch** - GitHub Actions will automatically build and deploy
+2. **Live URL**: https://danja.github.io/mult/
+3. **Build artifacts** are stored in the `dist/` directory
+4. **Custom domain** can be configured in repository settings
+
+The deployment workflow includes:
+- Node.js 18 environment
+- Dependency installation with `npm ci`  
+- Production build with optimized assets
+- Automatic deployment to GitHub Pages
 
 ## 📊 Data Format
 

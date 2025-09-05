@@ -22,7 +22,7 @@ async function initApp(): Promise<void> {
     uiController.showLoading();
 
     // Load and initialize the visualization
-    await visualization.initialize('/universe.ttl');
+    await visualization.initialize('./universe.ttl');
     
     console.log('RDF Multiverse Visualization loaded successfully!');
 

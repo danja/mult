@@ -1,3 +1,4 @@
+// @ts-ignore - rdf-ext types are not available
 import rdf from 'rdf-ext';
 import { Parser } from 'n3';
 import type { DatasetCore, NamedNode } from '@rdfjs/types';

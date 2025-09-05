@@ -29,7 +29,7 @@ export class InputControls {
   };
 
   private keyState: KeyState = {};
-  private keyRepeatTimer: number | null = null;
+  private keyRepeatTimer: ReturnType<typeof setTimeout> | null = null;
 
   private controls: CameraControls;
   private canvas: HTMLCanvasElement;
