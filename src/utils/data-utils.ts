@@ -1,4 +1,4 @@
-import { MultiverseNode, MultiverseLayer, MultiverseTriple } from '@/types';
+import type { MultiverseNode, MultiverseLayer, MultiverseTriple } from '@/types';
 
 /**
  * Parse hex color string to number

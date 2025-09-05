@@ -1,4 +1,4 @@
-import { VisualizationConfig } from '../types';
+import type { VisualizationConfig } from '../types';
 
 // Mobile performance optimizations
 export const VISUALIZATION_CONFIG: VisualizationConfig = {

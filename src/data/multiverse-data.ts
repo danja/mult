@@ -1,5 +1,5 @@
 import { RDFDataLoader } from './rdf-loader';
-import { RDFQueryResult } from '@/types';
+import type { RDFQueryResult } from '@/types';
 import { validateNodes, validateLayers } from '@/utils/data-utils';
 
 /**

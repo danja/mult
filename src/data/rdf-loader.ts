@@ -1,5 +1,6 @@
 import rdf from 'rdf-ext';
-import type { DatasetCore, Quad, NamedNode } from '@rdfjs/types';
+import { Parser } from 'n3';
+import type { DatasetCore, NamedNode } from '@rdfjs/types';
 import type { 
   MultiverseNode, 
   MultiverseTriple, 
@@ -11,16 +12,9 @@ import { NAMESPACES } from '@/config';
 
 export class RDFDataLoader {
   private dataset: DatasetCore | null = null;
-  private namespaces: Record<string, NamedNode>;
 
   constructor() {
-    this.namespaces = {
-      ex: rdf.namedNode(NAMESPACES.ex),
-      mv: rdf.namedNode(NAMESPACES.mv),
-      rdf: rdf.namedNode(NAMESPACES.rdf),
-      rdfs: rdf.namedNode(NAMESPACES.rdfs),
-      xsd: rdf.namedNode(NAMESPACES.xsd),
-    };
+    // Namespaces are now handled by N3.js parser
   }
 
   /**
@@ -55,105 +49,34 @@ export class RDFDataLoader {
   }
 
   /**
-   * Parse TTL string data into RDF dataset
+   * Parse TTL string data into RDF dataset using N3.js parser
    */
   private async parseTTL(ttlData: string): Promise<DatasetCore> {
-    try {
-      // Create a simple TTL parser for our specific data format
-      return this.parseSimpleTTL(ttlData);
-    } catch (error) {
-      throw new Error(`TTL parsing failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    }
-  }
-
-  /**
-   * Simple TTL parser for our specific data structure
-   */
-  private parseSimpleTTL(ttlData: string): DatasetCore {
-    const dataset = rdf.dataset();
-    const lines = ttlData.split('\n');
-    
-    let currentSubject: NamedNode | null = null;
-    
-    for (let line of lines) {
-      line = line.trim();
+    return new Promise((resolve, reject) => {
+      const dataset = rdf.dataset();
+      const parser = new Parser();
       
-      // Skip comments and empty lines
-      if (!line || line.startsWith('#') || line.startsWith('@')) {
-        continue;
-      }
-      
-      // Handle triple statements
-      if (line.includes(' a ') || line.includes(' rdfs:') || line.includes(' mv:')) {
-        const parts = this.parseTripleLine(line);
-        if (parts) {
-          const { subject, predicate, object } = parts;
-          const quad = rdf.quad(
-            rdf.namedNode(subject),
-            rdf.namedNode(predicate),
-            object.startsWith('"') ? rdf.literal(object.slice(1, -1)) : rdf.namedNode(object)
+      parser.parse(ttlData, (error: any, quad: any) => {
+        if (error) {
+          reject(new Error(`TTL parsing failed: ${error.message}`));
+        } else if (quad) {
+          // Convert N3.js quad to RDF/JS quad
+          const rdfQuad = rdf.quad(
+            rdf.namedNode(quad.subject.value),
+            rdf.namedNode(quad.predicate.value),
+            quad.object.termType === 'Literal' 
+              ? rdf.literal(quad.object.value, quad.object.language || quad.object.datatype)
+              : rdf.namedNode(quad.object.value)
           );
-          dataset.add(quad);
-          
-          if (!currentSubject || subject !== currentSubject.value) {
-            currentSubject = rdf.namedNode(subject);
-          }
+          dataset.add(rdfQuad);
+        } else {
+          // Parsing complete
+          resolve(dataset);
         }
-      }
-    }
-    
-    return dataset;
+      });
+    });
   }
 
-  /**
-   * Parse a single triple line
-   */
-  private parseTripleLine(line: string): { subject: string; predicate: string; object: string } | null {
-    // Remove trailing semicolon or period
-    line = line.replace(/[;.]$/, '').trim();
-    
-    // Simple regex to parse subject predicate object
-    const match = line.match(/^(\S+)\s+(\S+)\s+(.+)$/);
-    if (!match) return null;
-    
-    let [, subject, predicate, object] = match;
-    
-    // Expand prefixes
-    subject = this.expandPrefix(subject);
-    predicate = this.expandPrefix(predicate);
-    object = this.expandPrefix(object);
-    
-    return { subject, predicate, object };
-  }
-
-  /**
-   * Expand namespace prefixes
-   */
-  private expandPrefix(term: string): string {
-    if (term.startsWith('"') && term.endsWith('"')) {
-      return term; // Keep literals as-is
-    }
-    
-    if (term.includes(':')) {
-      const [prefix, local] = term.split(':', 2);
-      switch (prefix) {
-        case 'ex':
-          return NAMESPACES.ex + local;
-        case 'mv':
-          return NAMESPACES.mv + local;
-        case 'rdf':
-          return NAMESPACES.rdf + local;
-        case 'rdfs':
-          return NAMESPACES.rdfs + local;
-        case 'xsd':
-          return NAMESPACES.xsd + local;
-        default:
-          return term;
-      }
-    }
-    
-    return term;
-  }
 
   /**
    * Query the loaded dataset and extract visualization data

@@ -1,4 +1,4 @@
-import { CameraControls, TouchState } from '@/types';
+import type { CameraControls, TouchState } from '@/types';
 import { TOUCH_SETTINGS } from '@/config';
 
 export class TouchControls {
