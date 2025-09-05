@@ -1,5 +1,5 @@
 import { SceneManager } from './scene-manager';
-import { TouchControls } from './touch-controls';
+import { InputControls } from './input-controls';
 import { multiverseDataService } from '@/data';
 import type { 
   UIState, 
@@ -12,7 +12,7 @@ import { DEFAULT_CAMERA_SETTINGS, VISUALIZATION_CONFIG } from '@/config';
 
 export class MultiverseVisualization {
   private sceneManager: SceneManager;
-  private touchControls: TouchControls;
+  private inputControls: InputControls;
   private container: HTMLElement;
   private animationId: number | null = null;
   private frameCounter = 0;
@@ -46,8 +46,8 @@ export class MultiverseVisualization {
     this.container = container;
     this.sceneManager = new SceneManager(container);
     
-    // Initialize touch controls
-    this.touchControls = new TouchControls(
+    // Initialize input controls (touch, mouse, keyboard)
+    this.inputControls = new InputControls(
       this.sceneManager.renderer.domElement,
       this.cameraControls,
       (controls) => {
@@ -196,14 +196,14 @@ export class MultiverseVisualization {
    * Reset camera to default position
    */
   resetCamera(): void {
-    this.touchControls.reset();
+    this.inputControls.reset();
   }
 
   /**
    * Move camera to top-down view
    */
   setTopView(): void {
-    this.touchControls.setTopView();
+    this.inputControls.setTopView();
   }
 
   /**
@@ -217,7 +217,7 @@ export class MultiverseVisualization {
    * Get current camera controls
    */
   getCameraControls(): CameraControls {
-    return this.touchControls.getControls();
+    return this.inputControls.getControls();
   }
 
   /**
@@ -298,7 +298,7 @@ export class MultiverseVisualization {
    */
   dispose(): void {
     this.stopAnimation();
-    this.touchControls.dispose();
+    this.inputControls.dispose();
     this.sceneManager.dispose();
   }
 }
