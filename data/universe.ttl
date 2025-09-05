@@ -82,7 +82,7 @@ ex:Animated a mv:Universe ;
 
 # Character entities
 ex:PeterParker_MCU a mv:Character ;
-    rdfs:label "Peter Parker" ;
+    rdfs:label "Peter Data" ;
     mv:belongsToUniverse ex:MCU ;
     mv:hasPosition "0,0,0"^^xsd:string ;
     mv:hasSubtitle "Tom Holland" .
@@ -97,7 +97,7 @@ ex:PeterParker_ASM a mv:Character ;
     rdfs:label "Peter Parker" ;
     mv:belongsToUniverse ex:ASM ;
     mv:hasPosition "0,13.5,0"^^xsd:string ;
-    mv:hasSubtitle "Andrew Garfield" .
+    mv:hasSubtitle "Andrew Garfield the cat" .
 
 ex:MilesMorales a mv:Character ;
     rdfs:label "Miles Morales" ;

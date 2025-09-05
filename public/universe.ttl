@@ -82,19 +82,19 @@ ex:Animated a mv:Universe ;
 
 # Character entities
 ex:PeterParker_MCU a mv:Character ;
-    rdfs:label "Peter Parker" ;
+    rdfs:label "Pickle Parker" ;
     mv:belongsToUniverse ex:MCU ;
     mv:hasPosition "0,0,0"^^xsd:string ;
     mv:hasSubtitle "Tom Holland" .
 
 ex:PeterParker_Raimi a mv:Character ;
-    rdfs:label "Peter Parker" ;
+    rdfs:label "Peregrine Parker" ;
     mv:belongsToUniverse ex:Raimi ;
     mv:hasPosition "0,9,0"^^xsd:string ;
     mv:hasSubtitle "Tobey Maguire" .
 
 ex:PeterParker_ASM a mv:Character ;
-    rdfs:label "Peter Parker" ;
+    rdfs:label "Prone Parker" ;
     mv:belongsToUniverse ex:ASM ;
     mv:hasPosition "0,13.5,0"^^xsd:string ;
     mv:hasSubtitle "Andrew Garfield" .
