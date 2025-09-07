@@ -7,15 +7,42 @@ import type {
   MultiverseTriple, 
   MultiverseLayer, 
   SharedConnection, 
-  RDFQueryResult 
+  RDFQueryResult,
+  ConfigurableRDFLoader
 } from '@/types';
-import { NAMESPACES } from '@/config';
+import type { VisualizationMapping } from '@/config/rdf-mapping';
+import { DEFAULT_RDF_MAPPING } from '@/config';
 
-export class RDFDataLoader {
+export class RDFDataLoader implements ConfigurableRDFLoader {
   private dataset: DatasetCore | null = null;
+  private mapping: VisualizationMapping = DEFAULT_RDF_MAPPING;
 
-  constructor() {
-    // Namespaces are now handled by N3.js parser
+  constructor(mapping?: VisualizationMapping) {
+    if (mapping) {
+      this.mapping = mapping;
+    }
+  }
+
+  /**
+   * Load data using a specific mapping configuration
+   */
+  async loadWithMapping(source: string, mapping: VisualizationMapping): Promise<void> {
+    this.mapping = mapping;
+    await this.loadTTL(source);
+  }
+
+  /**
+   * Set the mapping configuration
+   */
+  setMapping(mapping: VisualizationMapping): void {
+    this.mapping = mapping;
+  }
+
+  /**
+   * Get the current mapping configuration
+   */
+  getMapping(): VisualizationMapping {
+    return this.mapping;
   }
 
   /**
@@ -80,45 +107,56 @@ export class RDFDataLoader {
 
 
   /**
-   * Query the loaded dataset and extract visualization data
+   * Query data using the loaded mapping configuration
    */
-  queryMultiverseData(): RDFQueryResult {
+  queryData(): RDFQueryResult {
     if (!this.dataset) {
       throw new Error('No RDF data loaded. Call loadTTL() first.');
     }
 
-    const nodes = this.extractNodes();
-    const triples = this.extractTriples();
+    const nodes = this.extractEntities();
+    const triples = this.extractRelationships();
     const layers = this.extractLayers();
-    const sharedConnections = this.extractSharedConnections();
+    const sharedConnections = this.extractCrossLayerConnections();
 
     return {
       nodes,
       triples,
       layers,
       sharedConnections,
+      mappingConfig: this.mapping,
     };
   }
 
   /**
-   * Extract nodes (characters and movies) from the dataset
+   * Legacy method for backward compatibility
    */
-  private extractNodes(): MultiverseNode[] {
+  queryMultiverseData(): RDFQueryResult {
+    return this.queryData();
+  }
+
+  /**
+   * Extract entities from the dataset using the mapping configuration
+   */
+  private extractEntities(): MultiverseNode[] {
     if (!this.dataset) return [];
 
     const nodes: MultiverseNode[] = [];
-    const characterType = rdf.namedNode(`${NAMESPACES.mv}Character`);
-    const movieType = rdf.namedNode(`${NAMESPACES.mv}Movie`);
+    const rdfType = rdf.namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type');
+    
+    // Create lookup for entity types
+    const entityTypeMap = new Map<string, string>();
+    this.mapping.entityTypes.forEach(entityType => {
+      entityTypeMap.set(entityType.rdfClass, entityType.typeId);
+    });
 
-    // Get all entities that are either characters or movies
+    // Find all entities of the configured types
     for (const quad of this.dataset) {
-      if (quad.predicate.equals(rdf.namedNode(`${NAMESPACES.rdf}type`)) &&
-          (quad.object.equals(characterType) || quad.object.equals(movieType))) {
-        
+      if (quad.predicate.equals(rdfType) && entityTypeMap.has(quad.object.value)) {
         const entityUri = quad.subject as NamedNode;
-        const entityType = quad.object.equals(characterType) ? 'character' : 'movie';
+        const typeId = entityTypeMap.get(quad.object.value)!;
         
-        const node = this.buildNodeFromEntity(entityUri, entityType);
+        const node = this.buildEntityFromRDF(entityUri, typeId);
         if (node) {
           nodes.push(node);
         }
@@ -129,63 +167,105 @@ export class RDFDataLoader {
   }
 
   /**
-   * Build a MultiverseNode from an RDF entity
+   * Build a MultiverseNode from an RDF entity using configuration mappings
    */
-  private buildNodeFromEntity(entityUri: NamedNode, type: 'character' | 'movie'): MultiverseNode | null {
+  private buildEntityFromRDF(entityUri: NamedNode, typeId: string): MultiverseNode | null {
     if (!this.dataset) return null;
 
-    const label = this.getPropertyValue(entityUri, rdf.namedNode(`${NAMESPACES.rdfs}label`));
-    const position = this.getPropertyValue(entityUri, rdf.namedNode(`${NAMESPACES.mv}hasPosition`));
-    const universe = this.getPropertyValue(entityUri, rdf.namedNode(`${NAMESPACES.mv}belongsToUniverse`));
-    const subtitle = this.getPropertyValue(entityUri, rdf.namedNode(`${NAMESPACES.mv}hasSubtitle`));
-
-    if (!label || !position || !universe) {
-      console.warn(`Incomplete data for entity: ${entityUri.value}`);
-      return null;
-    }
-
-    // Parse position coordinates
-    const coords = position.split(',').map(Number);
-    if (coords.length !== 3) {
-      console.warn(`Invalid position format for entity: ${entityUri.value}`);
-      return null;
-    }
-
-    // Extract layer name from universe URI
-    const layerName = universe.split('/').pop() || '';
-
-    return {
+    const node: Partial<MultiverseNode> = {
       id: entityUri.value,
-      label,
-      layer: layerName,
-      x: coords[0],
-      y: coords[1],
-      z: coords[2],
-      subtitle: subtitle || undefined,
-      type,
+      type: typeId,
+      properties: {}
     };
+
+    // Extract properties based on mapping configuration
+    const requiredProps: string[] = [];
+    for (const propMapping of this.mapping.properties) {
+      const propertyValue = this.getPropertyValue(entityUri, rdf.namedNode(propMapping.rdfProperty));
+      
+      if (!propertyValue && propMapping.required) {
+        requiredProps.push(propMapping.rdfProperty);
+        continue;
+      }
+
+      if (propertyValue) {
+        // Apply transform if specified
+        const transformedValue = propMapping.transform 
+          ? propMapping.transform(propertyValue)
+          : propertyValue;
+
+        // Map to visualization attribute
+        switch (propMapping.visualAttribute) {
+          case 'label':
+            node.label = transformedValue;
+            break;
+          case 'position':
+            if (typeof transformedValue === 'object' && transformedValue.x !== undefined) {
+              node.x = transformedValue.x;
+              node.y = transformedValue.y;
+              node.z = transformedValue.z;
+            } else {
+              // Fallback: try to parse as comma-separated coordinates
+              const coords = propertyValue.split(',').map(Number);
+              if (coords.length === 3) {
+                node.x = coords[0];
+                node.y = coords[1]; 
+                node.z = coords[2];
+              }
+            }
+            break;
+          case 'layer':
+            node.layer = transformedValue;
+            break;
+          case 'subtitle':
+            node.subtitle = transformedValue;
+            break;
+          default:
+            // Store in additional properties
+            if (node.properties) {
+              node.properties[propMapping.rdfProperty] = transformedValue;
+            }
+        }
+      }
+    }
+
+    // Check if all required properties are present
+    if (requiredProps.length > 0) {
+      console.warn(`Missing required properties for entity ${entityUri.value}:`, requiredProps);
+      return null;
+    }
+
+    // Validate required fields
+    if (!node.label || node.x === undefined || node.y === undefined || node.z === undefined || !node.layer) {
+      console.warn(`Incomplete visualization data for entity: ${entityUri.value}`);
+      return null;
+    }
+
+    return node as MultiverseNode;
   }
 
   /**
-   * Extract relationship triples from the dataset
+   * Extract relationships from the dataset using configuration mappings
    */
-  private extractTriples(): MultiverseTriple[] {
+  private extractRelationships(): MultiverseTriple[] {
     if (!this.dataset) return [];
 
     const triples: MultiverseTriple[] = [];
-    const appearsIn = rdf.namedNode(`${NAMESPACES.mv}appearsIn`);
-    const cameoIn = rdf.namedNode(`${NAMESPACES.mv}cameoIn`);
+    
+    // Create set of relationship predicates from configuration
+    const relationshipPredicates = new Set(
+      this.mapping.relationships.map(rel => rel.rdfPredicate)
+    );
 
     for (const quad of this.dataset) {
-      if (quad.predicate.equals(appearsIn) || quad.predicate.equals(cameoIn)) {
+      if (relationshipPredicates.has(quad.predicate.value)) {
         const subject = quad.subject.value;
         const predicate = quad.predicate.value;
         const object = quad.object.value;
         
         // Determine layer from the subject entity
         const subjectNode = quad.subject as NamedNode;
-        const universe = this.getPropertyValue(subjectNode, rdf.namedNode(`${NAMESPACES.mv}belongsToUniverse`));
-        const layer = universe ? universe.split('/').pop() || '' : '';
+        const layer = this.getEntityLayer(subjectNode);
 
         triples.push({
           subject,
@@ -200,32 +280,74 @@ export class RDFDataLoader {
   }
 
   /**
-   * Extract layer/universe definitions from the dataset
+   * Helper method to get layer assignment for an entity
+   */
+  private getEntityLayer(entityUri: NamedNode): string {
+    const layerProperty = rdf.namedNode(this.mapping.layerGrouping.layerProperty);
+    const layerValue = this.getPropertyValue(entityUri, layerProperty);
+    
+    if (layerValue) {
+      return this.mapping.layerGrouping.extractLayerId(layerValue);
+    }
+    
+    return '';
+  }
+
+  /**
+   * Extract layer/group definitions from the dataset using configuration
    */
   private extractLayers(): Record<string, MultiverseLayer> {
     if (!this.dataset) return {};
 
     const layers: Record<string, MultiverseLayer> = {};
-    const universeType = rdf.namedNode(`${NAMESPACES.mv}Universe`);
+    
+    // If no layer class is configured, return empty layers
+    if (!this.mapping.layerGrouping.layerClass) {
+      return layers;
+    }
+
+    const rdfType = rdf.namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type');
+    const layerType = rdf.namedNode(this.mapping.layerGrouping.layerClass);
 
     for (const quad of this.dataset) {
-      if (quad.predicate.equals(rdf.namedNode(`${NAMESPACES.rdf}type`)) &&
-          quad.object.equals(universeType)) {
+      if (quad.predicate.equals(rdfType) && quad.object.equals(layerType)) {
+        const layerUri = quad.subject as NamedNode;
         
-        const universeUri = quad.subject as NamedNode;
-        const name = this.getPropertyValue(universeUri, rdf.namedNode(`${NAMESPACES.rdfs}label`));
-        const colorStr = this.getPropertyValue(universeUri, rdf.namedNode(`${NAMESPACES.mv}hasColor`));
-        const heightStr = this.getPropertyValue(universeUri, rdf.namedNode(`${NAMESPACES.mv}hasHeight`));
+        // Build layer from configured properties
+        const layer: Partial<MultiverseLayer> = {};
+        let layerKey = '';
+        
+        // Extract properties based on mapping configuration
+        for (const propMapping of this.mapping.properties) {
+          const propertyValue = this.getPropertyValue(layerUri, rdf.namedNode(propMapping.rdfProperty));
+          
+          if (propertyValue) {
+            const transformedValue = propMapping.transform 
+              ? propMapping.transform(propertyValue)
+              : propertyValue;
 
-        if (name && colorStr && heightStr) {
-          const layerKey = universeUri.value.split('/').pop() || '';
-          const color = parseInt(colorStr, 16);
-          const height = parseFloat(heightStr);
+            switch (propMapping.visualAttribute) {
+              case 'label':
+                layer.name = transformedValue;
+                break;
+              case 'color':
+                layer.color = transformedValue;
+                break;
+              case 'height':
+                layer.height = transformedValue;
+                break;
+            }
+          }
+        }
 
+        // Generate layer key
+        layerKey = this.mapping.layerGrouping.extractLayerId(layerUri.value);
+        
+        if (layer.name && layerKey) {
           layers[layerKey] = {
-            name,
-            color,
-            height,
+            name: layer.name,
+            color: layer.color || 0x666666, // Default gray color
+            height: layer.height || 0, // Default height
           };
         }
       }
@@ -235,16 +357,22 @@ export class RDFDataLoader {
   }
 
   /**
-   * Extract shared connections between entities
+   * Extract cross-layer connections between entities using configuration
    */
-  private extractSharedConnections(): SharedConnection[] {
+  private extractCrossLayerConnections(): SharedConnection[] {
     if (!this.dataset) return [];
 
     const connections: SharedConnection[] = [];
-    const connectsTo = rdf.namedNode(`${NAMESPACES.mv}connectsTo`);
+    
+    // Check if cross-layer connections are configured
+    if (!this.mapping.crossLayerConnections) {
+      return connections;
+    }
+
+    const connectsPredicate = rdf.namedNode(this.mapping.crossLayerConnections.rdfPredicate);
 
     for (const quad of this.dataset) {
-      if (quad.predicate.equals(connectsTo)) {
+      if (quad.predicate.equals(connectsPredicate)) {
         connections.push({
           id: quad.subject.value,
           connectTo: quad.object.value,

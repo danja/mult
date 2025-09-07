@@ -1,4 +1,5 @@
 import type { VisualizationConfig } from '../types';
+import { DEFAULT_MULTIVERSE_MAPPING } from './rdf-mapping';
 
 // Mobile performance optimizations
 export const VISUALIZATION_CONFIG: VisualizationConfig = {
@@ -9,7 +10,8 @@ export const VISUALIZATION_CONFIG: VisualizationConfig = {
   updateEvery: 2, // Throttle frame updates
 };
 
-// RDF namespaces
+// RDF namespaces (deprecated - use mapping configuration instead)
+// Kept for backward compatibility
 export const NAMESPACES = {
   ex: 'http://example.org/multiverse/',
   mv: 'http://example.org/multiverse/vocab/',
@@ -17,6 +19,9 @@ export const NAMESPACES = {
   rdfs: 'http://www.w3.org/2000/01/rdf-schema#',
   xsd: 'http://www.w3.org/2001/XMLSchema#',
 };
+
+// Default RDF mapping configuration
+export const DEFAULT_RDF_MAPPING = DEFAULT_MULTIVERSE_MAPPING;
 
 // Default camera settings
 export const DEFAULT_CAMERA_SETTINGS = {

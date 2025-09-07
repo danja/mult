@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('RDF Multiverse Visualization', () => {
+test.describe('Generic RDF Visualization System', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
   });
@@ -13,7 +13,7 @@ test.describe('RDF Multiverse Visualization', () => {
     await expect(page.locator('#info')).toBeVisible();
     
     // Check that the title is correct
-    await expect(page.locator('.title')).toContainText('RDF Multiverse');
+    await expect(page.locator('.title')).toContainText('RDF Visualization');
   });
 
   test('should show loading screen initially', async ({ page }) => {

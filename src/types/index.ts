@@ -1,4 +1,8 @@
 import * as THREE from 'three';
+import type { VisualizationMapping } from '@/config/rdf-mapping';
+
+// Generic entity type support
+export type EntityTypeId = string;
 
 // RDF and data types
 export interface MultiverseNode {
@@ -9,7 +13,9 @@ export interface MultiverseNode {
   y: number;
   z: number;
   subtitle?: string;
-  type: 'character' | 'movie';
+  type: EntityTypeId;
+  /** Additional properties extracted from RDF, indexed by property URI */
+  properties?: Record<string, any>;
 }
 
 export interface MultiverseTriple {
@@ -83,6 +89,16 @@ export interface RDFQueryResult {
   triples: MultiverseTriple[];
   layers: Record<string, MultiverseLayer>;
   sharedConnections: SharedConnection[];
+  /** The mapping configuration used to generate this result */
+  mappingConfig?: VisualizationMapping;
+}
+
+// Configuration-aware types
+export interface ConfigurableRDFLoader {
+  /** Load data using a specific mapping configuration */
+  loadWithMapping(source: string, mapping: VisualizationMapping): Promise<void>;
+  /** Query data using the loaded mapping configuration */
+  queryData(): RDFQueryResult;
 }
 
 // Event types

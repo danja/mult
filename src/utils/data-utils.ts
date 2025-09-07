@@ -36,7 +36,7 @@ export function groupNodesByLayer(nodes: MultiverseNode[]): Record<string, Multi
 /**
  * Filter nodes by type
  */
-export function filterNodesByType(nodes: MultiverseNode[], type: 'character' | 'movie'): MultiverseNode[] {
+export function filterNodesByType(nodes: MultiverseNode[], type: string): MultiverseNode[] {
   return nodes.filter(node => node.type === type);
 }
 
@@ -92,7 +92,7 @@ export function validateNodes(nodes: MultiverseNode[]): boolean {
   for (const node of nodes) {
     if (!node.id || !node.label || !node.layer || 
         typeof node.x !== 'number' || typeof node.y !== 'number' || typeof node.z !== 'number' ||
-        !['character', 'movie'].includes(node.type)) {
+        !node.type) {
       console.error('Invalid node data:', node);
       return false;
     }
@@ -117,20 +117,21 @@ export function sortLayersByHeight(layers: Record<string, MultiverseLayer>): [st
 /**
  * Generate layer statistics
  */
-export function generateLayerStats(nodes: MultiverseNode[]): Record<string, { characters: number; movies: number; total: number }> {
-  const stats: Record<string, { characters: number; movies: number; total: number }> = {};
+export function generateLayerStats(nodes: MultiverseNode[]): Record<string, Record<string, number> & { total: number }> {
+  const stats: Record<string, Record<string, number> & { total: number }> = {};
   
   for (const node of nodes) {
     if (!stats[node.layer]) {
-      stats[node.layer] = { characters: 0, movies: 0, total: 0 };
+      stats[node.layer] = { total: 0 };
     }
     
     stats[node.layer].total++;
-    if (node.type === 'character') {
-      stats[node.layer].characters++;
-    } else {
-      stats[node.layer].movies++;
+    
+    // Count by entity type
+    if (!stats[node.layer][node.type]) {
+      stats[node.layer][node.type] = 0;
     }
+    stats[node.layer][node.type]++;
   }
   
   return stats;

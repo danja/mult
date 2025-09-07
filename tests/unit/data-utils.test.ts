@@ -42,9 +42,9 @@ describe('Data Utils', () => {
   describe('groupNodesByLayer', () => {
     it('should group nodes by their layer property', () => {
       const nodes: MultiverseNode[] = [
-        { id: '1', label: 'Node 1', layer: 'layer1', x: 0, y: 0, z: 0, type: 'character' },
-        { id: '2', label: 'Node 2', layer: 'layer1', x: 1, y: 1, z: 1, type: 'movie' },
-        { id: '3', label: 'Node 3', layer: 'layer2', x: 2, y: 2, z: 2, type: 'character' },
+        { id: '1', label: 'Node 1', layer: 'layer1', x: 0, y: 0, z: 0, type: 'entity' },
+        { id: '2', label: 'Node 2', layer: 'layer1', x: 1, y: 1, z: 1, type: 'entity' },
+        { id: '3', label: 'Node 3', layer: 'layer2', x: 2, y: 2, z: 2, type: 'entity' },
       ];
 
       const grouped = groupNodesByLayer(nodes);
@@ -59,20 +59,20 @@ describe('Data Utils', () => {
   describe('filterNodesByType', () => {
     it('should filter nodes by type', () => {
       const nodes: MultiverseNode[] = [
-        { id: '1', label: 'Character 1', layer: 'layer1', x: 0, y: 0, z: 0, type: 'character' },
-        { id: '2', label: 'Movie 1', layer: 'layer1', x: 1, y: 1, z: 1, type: 'movie' },
-        { id: '3', label: 'Character 2', layer: 'layer2', x: 2, y: 2, z: 2, type: 'character' },
+        { id: '1', label: 'Person 1', layer: 'layer1', x: 0, y: 0, z: 0, type: 'person' },
+        { id: '2', label: 'Department 1', layer: 'layer1', x: 1, y: 1, z: 1, type: 'department' },
+        { id: '3', label: 'Person 2', layer: 'layer2', x: 2, y: 2, z: 2, type: 'person' },
       ];
 
-      expect(filterNodesByType(nodes, 'character')).toEqual([nodes[0], nodes[2]]);
-      expect(filterNodesByType(nodes, 'movie')).toEqual([nodes[1]]);
+      expect(filterNodesByType(nodes, 'person')).toEqual([nodes[0], nodes[2]]);
+      expect(filterNodesByType(nodes, 'department')).toEqual([nodes[1]]);
     });
   });
 
   describe('findNodeById', () => {
     const nodes: MultiverseNode[] = [
-      { id: '1', label: 'Node 1', layer: 'layer1', x: 0, y: 0, z: 0, type: 'character' },
-      { id: '2', label: 'Node 2', layer: 'layer1', x: 1, y: 1, z: 1, type: 'movie' },
+      { id: '1', label: 'Node 1', layer: 'layer1', x: 0, y: 0, z: 0, type: 'entity' },
+      { id: '2', label: 'Node 2', layer: 'layer1', x: 1, y: 1, z: 1, type: 'entity' },
     ];
 
     it('should find node by ID', () => {
@@ -87,8 +87,8 @@ describe('Data Utils', () => {
 
   describe('calculateDistance', () => {
     it('should calculate 3D distance between nodes', () => {
-      const node1: MultiverseNode = { id: '1', label: 'Node 1', layer: 'layer1', x: 0, y: 0, z: 0, type: 'character' };
-      const node2: MultiverseNode = { id: '2', label: 'Node 2', layer: 'layer1', x: 3, y: 4, z: 0, type: 'character' };
+      const node1: MultiverseNode = { id: '1', label: 'Node 1', layer: 'layer1', x: 0, y: 0, z: 0, type: 'entity' };
+      const node2: MultiverseNode = { id: '2', label: 'Node 2', layer: 'layer1', x: 3, y: 4, z: 0, type: 'entity' };
 
       expect(calculateDistance(node1, node2)).toBe(5); // 3-4-5 triangle
     });
@@ -97,9 +97,9 @@ describe('Data Utils', () => {
   describe('getUniqueLayerNames', () => {
     it('should return unique layer names', () => {
       const nodes: MultiverseNode[] = [
-        { id: '1', label: 'Node 1', layer: 'layer1', x: 0, y: 0, z: 0, type: 'character' },
-        { id: '2', label: 'Node 2', layer: 'layer1', x: 1, y: 1, z: 1, type: 'movie' },
-        { id: '3', label: 'Node 3', layer: 'layer2', x: 2, y: 2, z: 2, type: 'character' },
+        { id: '1', label: 'Node 1', layer: 'layer1', x: 0, y: 0, z: 0, type: 'entity' },
+        { id: '2', label: 'Node 2', layer: 'layer1', x: 1, y: 1, z: 1, type: 'entity' },
+        { id: '3', label: 'Node 3', layer: 'layer2', x: 2, y: 2, z: 2, type: 'entity' },
       ];
 
       expect(getUniqueLayerNames(nodes)).toEqual(['layer1', 'layer2']);
@@ -109,8 +109,8 @@ describe('Data Utils', () => {
   describe('validateNodes', () => {
     it('should validate correct node data', () => {
       const validNodes: MultiverseNode[] = [
-        { id: '1', label: 'Node 1', layer: 'layer1', x: 0, y: 0, z: 0, type: 'character' },
-        { id: '2', label: 'Node 2', layer: 'layer1', x: 1, y: 1, z: 1, type: 'movie' },
+        { id: '1', label: 'Node 1', layer: 'layer1', x: 0, y: 0, z: 0, type: 'entity' },
+        { id: '2', label: 'Node 2', layer: 'layer1', x: 1, y: 1, z: 1, type: 'entity' },
       ];
 
       expect(validateNodes(validNodes)).toBe(true);
@@ -118,7 +118,7 @@ describe('Data Utils', () => {
 
     it('should reject invalid node data', () => {
       const invalidNodes = [
-        { id: '', label: 'Node 1', layer: 'layer1', x: 0, y: 0, z: 0, type: 'character' },
+        { id: '', label: 'Node 1', layer: 'layer1', x: 0, y: 0, z: 0, type: 'entity' },
       ] as MultiverseNode[];
 
       expect(validateNodes(invalidNodes)).toBe(false);
