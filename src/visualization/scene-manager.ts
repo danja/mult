@@ -165,6 +165,13 @@ export class SceneManager {
     });
     this.layerGroups = {};
     
+    // Remove edge labels before clearing edges array
+    this.edges.forEach(edge => {
+      if (edge.labelDiv && edge.labelDiv.parentNode) {
+        edge.labelDiv.parentNode.removeChild(edge.labelDiv);
+      }
+    });
+    
     // Clear arrays
     this.allNodes.length = 0;
     this.edges.length = 0;
@@ -561,6 +568,14 @@ export class SceneManager {
     if (this.container.contains(this.renderer.domElement)) {
       this.container.removeChild(this.renderer.domElement);
     }
+  }
+
+  /**
+   * Clear the current visualization for dataset switching
+   */
+  clearVisualization(): void {
+    this.clearScene();
+    console.log('Visualization cleared for dataset switch');
   }
 
   /**

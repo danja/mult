@@ -15,6 +15,7 @@ export class MappingConfigurationManager {
     this.registerConfiguration('default', DEFAULT_MULTIVERSE_MAPPING);
     this.registerConfiguration('multiverse', DEFAULT_MULTIVERSE_MAPPING);
     this.registerConfiguration('orgchart', EXAMPLE_ORG_CHART_MAPPING);
+    this.registerConfiguration('social', SOCIAL_NETWORK_MAPPING);
   }
 
   /**
@@ -174,6 +175,7 @@ export class MappingConfigurationManager {
     this.configurations.set('default', DEFAULT_MULTIVERSE_MAPPING);
     this.configurations.set('multiverse', DEFAULT_MULTIVERSE_MAPPING);
     this.configurations.set('orgchart', EXAMPLE_ORG_CHART_MAPPING);
+    this.configurations.set('social', SOCIAL_NETWORK_MAPPING);
     this.activeConfigurationId = 'default';
   }
 
@@ -193,6 +195,95 @@ export class MappingConfigurationManager {
     );
   }
 }
+
+// Create social network mapping configuration
+export const SOCIAL_NETWORK_MAPPING: VisualizationMapping = {
+  entityTypes: [
+    {
+      rdfClass: 'http://example.org/social/Person',
+      label: 'Person',
+      typeId: 'person'
+    },
+    {
+      rdfClass: 'http://example.org/social/Community',
+      label: 'Community', 
+      typeId: 'community'
+    }
+  ],
+  
+  properties: [
+    {
+      rdfProperty: 'http://xmlns.com/foaf/0.1/name',
+      visualAttribute: 'label',
+      required: true
+    },
+    {
+      rdfProperty: 'http://example.org/social/hasPosition',
+      visualAttribute: 'position',
+      required: true,
+      transform: (value: string) => {
+        const coords = value.split(',').map(Number);
+        return { x: coords[0], y: coords[1], z: coords[2] };
+      }
+    },
+    {
+      rdfProperty: 'http://example.org/social/memberOf',
+      visualAttribute: 'layer',
+      required: true,
+      transform: (value: string) => value.split('/').pop() || ''
+    },
+    {
+      rdfProperty: 'http://xmlns.com/foaf/0.1/title',
+      visualAttribute: 'subtitle',
+      required: false
+    },
+    {
+      rdfProperty: 'http://example.org/social/hasColor',
+      visualAttribute: 'color',
+      required: false,
+      transform: (value: string) => parseInt(value, 16)
+    },
+    {
+      rdfProperty: 'http://example.org/social/hasHeight',
+      visualAttribute: 'height',
+      required: false,
+      transform: (value: string) => parseFloat(value)
+    }
+  ],
+  
+  relationships: [
+    {
+      rdfPredicate: 'http://xmlns.com/foaf/0.1/knows',
+      label: 'knows'
+    },
+    {
+      rdfPredicate: 'http://example.org/social/mentors',
+      label: 'mentors'
+    },
+    {
+      rdfPredicate: 'http://example.org/social/collaboratesWith',
+      label: 'collaborates with'
+    }
+  ],
+  
+  layerGrouping: {
+    layerProperty: 'http://example.org/social/memberOf',
+    extractLayerId: (value: string) => value.split('/').pop() || '',
+    layerClass: 'http://example.org/social/Community'
+  },
+  
+  crossLayerConnections: {
+    rdfPredicate: 'http://example.org/social/mentors',
+    label: 'mentors'
+  },
+  
+  namespaces: {
+    foaf: 'http://xmlns.com/foaf/0.1/',
+    sn: 'http://example.org/social/',
+    rdf: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+    rdfs: 'http://www.w3.org/2000/01/rdf-schema#'
+  }
+};
 
 // Export singleton instance
 export const mappingManager = new MappingConfigurationManager();

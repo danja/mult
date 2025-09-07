@@ -237,6 +237,10 @@ npx playwright install
 npm run test:e2e
 ```
 
+```
+claude mcp add playwright npx '@playwright/mcp@latest'
+```
+
 ### Coverage
 
 Generate test coverage report:

@@ -11,10 +11,18 @@
     
     <div id="info">
       <div id="info-header">
-        <h3 class="title">RDF Multiverse (Modern)</h3>
+        <h3 class="title">Generic RDF Visualization</h3>
         <button id="collapseBtn" class="btn" aria-pressed="false">▾</button>
       </div>
       <div id="info-content">
+        <div class="dataset-selector">
+          <label for="dataset-select" class="select-label">📊 Dataset:</label>
+          <select id="dataset-select" class="dataset-select">
+            <option value="multiverse" data-file="/universe.ttl">Multiverse (Characters & Movies)</option>
+            <option value="social" data-file="/social-network.ttl">Social Network (People & Communities)</option>
+            <option value="orgchart" data-file="/org-chart.ttl">Org Chart (People & Departments)</option>
+          </select>
+        </div>
         <div class="button-group">
           <button id="animBtn" class="btn" aria-pressed="true">⏯️ Anim</button>
           <button id="labelsBtn" class="btn" data-mode="smart" aria-pressed="true">🏷️ Labels: Smart</button>

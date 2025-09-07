@@ -45,7 +45,7 @@ body {
   border-radius: 12px;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  width: 300px;
+  width: 320px;
   box-shadow: 0 4px 20px rgba(0,0,0,.3);
   z-index: 1000;
   transition: all 0.25s ease;
@@ -117,6 +117,52 @@ body {
 
 .btn:active {
   transform: translateY(0);
+}
+
+/* Dataset selector */
+.dataset-selector {
+  margin: 10px 0 15px 0;
+  padding: 10px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
+.select-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--accent-color);
+}
+
+.dataset-select {
+  width: 100%;
+  padding: 8px 10px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 6px;
+  color: var(--text-color);
+  font-size: 11px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dataset-select:hover {
+  background: rgba(255,255,255,0.15);
+  border-color: rgba(255,255,255,0.3);
+}
+
+.dataset-select:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px rgba(100, 210, 255, 0.2);
+}
+
+.dataset-select option {
+  background: #1e293b;
+  color: var(--text-color);
 }
 
 /* Help text */

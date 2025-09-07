@@ -1,0 +1,185 @@
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix sn: <http://example.org/social/> .
+@prefix geo: <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# Social Network Vocabulary
+sn:Person a rdfs:Class ;
+    rdfs:label "Person" ;
+    rdfs:comment "A person in the social network" .
+
+sn:Community a rdfs:Class ;
+    rdfs:label "Community" ;
+    rdfs:comment "A community or group within the social network" .
+
+sn:memberOf a rdf:Property ;
+    rdfs:label "member of" ;
+    rdfs:comment "Indicates community membership" .
+
+sn:hasPosition a rdf:Property ;
+    rdfs:label "has position" ;
+    rdfs:comment "3D position for visualization" .
+
+sn:hasInfluence a rdf:Property ;
+    rdfs:label "has influence" ;
+    rdfs:comment "Influence score in the network" .
+
+sn:hasColor a rdf:Property ;
+    rdfs:label "has color" ;
+    rdfs:comment "Visual color for communities" .
+
+sn:hasHeight a rdf:Property ;
+    rdfs:label "has height" ;
+    rdfs:comment "Layer height for communities" .
+
+# Communities
+sn:developers a sn:Community ;
+    foaf:name "Developers" ;
+    sn:hasPosition "0,0,0" ;
+    sn:memberOf sn:developers ;
+    sn:hasColor "0x4A90E2" ;
+    sn:hasHeight "0" .
+
+sn:designers a sn:Community ;
+    foaf:name "Designers" ;
+    sn:hasPosition "0,5,0" ;
+    sn:memberOf sn:designers ;
+    sn:hasColor "0xF5A623" ;
+    sn:hasHeight "5" .
+
+sn:researchers a sn:Community ;
+    foaf:name "Researchers" ;
+    sn:hasPosition "0,10,0" ;
+    sn:memberOf sn:researchers ;
+    sn:hasColor "0x7ED321" ;
+    sn:hasHeight "10" .
+
+sn:managers a sn:Community ;
+    foaf:name "Managers" ;
+    sn:hasPosition "0,15,0" ;
+    sn:memberOf sn:managers ;
+    sn:hasColor "0xD0021B" ;
+    sn:hasHeight "15" .
+
+# People in Developer Community
+sn:alice a sn:Person ;
+    foaf:name "Alice Johnson" ;
+    foaf:title "Senior Software Engineer" ;
+    sn:memberOf sn:developers ;
+    sn:hasPosition "2.5,0,1.8" ;
+    sn:hasInfluence "85" .
+
+sn:bob a sn:Person ;
+    foaf:name "Bob Chen" ;
+    foaf:title "Full Stack Developer" ;
+    sn:memberOf sn:developers ;
+    sn:hasPosition "1.2,0,2.8" ;
+    sn:hasInfluence "72" .
+
+sn:charlie a sn:Person ;
+    foaf:name "Charlie Davis" ;
+    foaf:title "DevOps Engineer" ;
+    sn:memberOf sn:developers ;
+    sn:hasPosition "3.1,0,0.9" ;
+    sn:hasInfluence "68" .
+
+# People in Designer Community  
+sn:diana a sn:Person ;
+    foaf:name "Diana Rodriguez" ;
+    foaf:title "UX Designer" ;
+    sn:memberOf sn:designers ;
+    sn:hasPosition "1.8,5,2.2" ;
+    sn:hasInfluence "78" .
+
+sn:elena a sn:Person ;
+    foaf:name "Elena Petrov" ;
+    foaf:title "Visual Designer" ;
+    sn:memberOf sn:designers ;
+    sn:hasPosition "2.9,5,1.1" ;
+    sn:hasInfluence "71" .
+
+sn:frank a sn:Person ;
+    foaf:name "Frank Kim" ;
+    foaf:title "Product Designer" ;
+    sn:memberOf sn:designers ;
+    sn:hasPosition "0.8,5,3.2" ;
+    sn:hasInfluence "74" .
+
+# People in Research Community
+sn:grace a sn:Person ;
+    foaf:name "Dr. Grace Wilson" ;
+    foaf:title "AI Research Scientist" ;
+    sn:memberOf sn:researchers ;
+    sn:hasPosition "2.1,10,2.5" ;
+    sn:hasInfluence "92" .
+
+sn:henry a sn:Person ;
+    foaf:name "Henry Thompson" ;
+    foaf:title "Data Scientist" ;
+    sn:memberOf sn:researchers ;
+    sn:hasPosition "1.5,10,1.3" ;
+    sn:hasInfluence "81" .
+
+sn:iris a sn:Person ;
+    foaf:name "Iris Nakamura" ;
+    foaf:title "ML Engineer" ;
+    sn:memberOf sn:researchers ;
+    sn:hasPosition "3.2,10,3.1" ;
+    sn:hasInfluence "79" .
+
+# People in Management Community
+sn:jack a sn:Person ;
+    foaf:name "Jack Williams" ;
+    foaf:title "Engineering Manager" ;
+    sn:memberOf sn:managers ;
+    sn:hasPosition "2.3,15,2.0" ;
+    sn:hasInfluence "88" .
+
+sn:karen a sn:Person ;
+    foaf:name "Karen Martinez" ;
+    foaf:title "Product Manager" ;
+    sn:memberOf sn:managers ;
+    sn:hasPosition "1.7,15,2.8" ;
+    sn:hasInfluence "85" .
+
+# Social Relationships
+# Developer connections
+sn:alice foaf:knows sn:bob, sn:charlie, sn:diana .
+sn:bob foaf:knows sn:alice, sn:charlie, sn:henry .
+sn:charlie foaf:knows sn:alice, sn:bob, sn:frank .
+
+# Designer connections  
+sn:diana foaf:knows sn:alice, sn:elena, sn:frank, sn:grace .
+sn:elena foaf:knows sn:diana, sn:frank, sn:iris .
+sn:frank foaf:knows sn:diana, sn:elena, sn:charlie .
+
+# Researcher connections
+sn:grace foaf:knows sn:diana, sn:henry, sn:iris, sn:jack .
+sn:henry foaf:knows sn:grace, sn:iris, sn:bob .
+sn:iris foaf:knows sn:grace, sn:henry, sn:elena .
+
+# Manager connections
+sn:jack foaf:knows sn:grace, sn:karen, sn:alice .
+sn:karen foaf:knows sn:jack, sn:diana, sn:grace .
+
+# Cross-layer mentorship relationships
+sn:mentors a rdf:Property ;
+    rdfs:label "mentors" ;
+    rdfs:comment "Mentorship relationship" .
+
+sn:jack sn:mentors sn:alice .
+sn:karen sn:mentors sn:diana .
+sn:grace sn:mentors sn:henry .
+sn:alice sn:mentors sn:bob .
+sn:diana sn:mentors sn:elena .
+
+# Project collaborations
+sn:collaboratesWith a rdf:Property ;
+    rdfs:label "collaborates with" ;
+    rdfs:comment "Active project collaboration" .
+
+sn:alice sn:collaboratesWith sn:grace, sn:diana .
+sn:bob sn:collaboratesWith sn:henry .
+sn:elena sn:collaboratesWith sn:iris .
+sn:frank sn:collaboratesWith sn:charlie .

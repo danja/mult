@@ -16,6 +16,7 @@ export class UIController {
     layerLegend?: HTMLElement;
     dataStats?: HTMLElement;
     loading?: HTMLElement;
+    datasetSelect?: HTMLSelectElement;
   } = {};
 
   constructor(visualization: MultiverseVisualization) {
@@ -41,6 +42,7 @@ export class UIController {
       layerLegend: document.querySelector('.layer-legend') as HTMLElement,
       dataStats: document.getElementById('data-stats') as HTMLElement,
       loading: document.getElementById('loading') as HTMLElement,
+      datasetSelect: document.getElementById('dataset-select') as HTMLSelectElement,
     };
   }
 
@@ -88,6 +90,11 @@ export class UIController {
     // Vertical connections toggle
     this.elements.verticalToggle?.addEventListener('change', () => {
       this.visualization.toggleVerticalConnections();
+    });
+
+    // Dataset selector
+    this.elements.datasetSelect?.addEventListener('change', (event) => {
+      this.handleDatasetChange(event);
     });
   }
 
@@ -332,6 +339,27 @@ export class UIController {
         checkbox.checked = visible;
       }
     });
+  }
+
+  /**
+   * Handle dataset selection change
+   */
+  private async handleDatasetChange(event: Event): Promise<void> {
+    const select = event.target as HTMLSelectElement;
+    const configId = select.value;
+    const option = select.selectedOptions[0];
+    const dataFile = option.dataset.file || '/universe.ttl';
+    
+    this.showLoading();
+    
+    try {
+      // Switch to the selected configuration and load new data
+      await this.visualization.switchDataset(configId, dataFile);
+      console.log(`Switched to dataset: ${configId} from file: ${dataFile}`);
+    } catch (error) {
+      console.error('Failed to switch dataset:', error);
+      this.handleError(error instanceof Error ? error : new Error('Failed to switch dataset'));
+    }
   }
 
   /**

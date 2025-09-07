@@ -282,6 +282,57 @@ export class MultiverseVisualization {
   }
 
   /**
+   * Switch to a different dataset with a specific configuration
+   */
+  async switchDataset(configurationId: string, dataSource: string): Promise<void> {
+    try {
+      // Load data with the specified configuration
+      this.data = await multiverseDataService.loadDataWithConfiguration(dataSource, configurationId);
+      
+      // Reset layer visibility state
+      this.uiState.layersVisible = {};
+      Object.keys(this.data.layers).forEach(layerName => {
+        this.uiState.layersVisible[layerName] = true;
+      });
+      
+      // Clear existing visualization and rebuild
+      this.sceneManager.clearVisualization();
+      this.sceneManager.buildVisualization(
+        this.data.nodes,
+        this.data.layers,
+        this.data.triples,
+        this.data.sharedConnections
+      );
+      
+      // Restore states
+      this.sceneManager.setVerticalConnectionsVisibility(this.uiState.showVerticalConnections);
+      this.sceneManager.setPerformanceMode(this.uiState.performanceMode);
+      
+      // Reset camera to default position
+      this.cameraControls = {
+        radius: DEFAULT_CAMERA_SETTINGS.radius,
+        theta: DEFAULT_CAMERA_SETTINGS.theta,
+        phi: DEFAULT_CAMERA_SETTINGS.phi,
+      };
+      this.sceneManager.positionCamera(this.cameraControls);
+      
+      // Trigger data loaded event
+      if (this.eventHandlers.onDataLoaded) {
+        this.eventHandlers.onDataLoaded(this.data);
+      }
+      
+      console.log(`Successfully switched to dataset: ${configurationId} from ${dataSource}`);
+      
+    } catch (error) {
+      console.error('Failed to switch dataset:', error);
+      if (this.eventHandlers.onError) {
+        this.eventHandlers.onError(error instanceof Error ? error : new Error('Failed to switch dataset'));
+      }
+      throw error;
+    }
+  }
+
+  /**
    * Export current state for debugging
    */
   exportState() {

@@ -18,6 +18,7 @@ describe('MappingConfigurationManager', () => {
       expect(configs).toContain('default');
       expect(configs).toContain('multiverse');
       expect(configs).toContain('orgchart');
+      expect(configs).toContain('social');
     });
 
     it('should set default as active configuration', () => {
@@ -231,7 +232,7 @@ describe('MappingConfigurationManager', () => {
       manager.reset();
       
       const configs = manager.listConfigurationIds();
-      expect(configs).toEqual(['default', 'multiverse', 'orgchart']);
+      expect(configs).toEqual(['default', 'multiverse', 'orgchart', 'social']);
       
       const activeConfig = manager.getActiveConfiguration();
       expect(activeConfig).toEqual(DEFAULT_MULTIVERSE_MAPPING);

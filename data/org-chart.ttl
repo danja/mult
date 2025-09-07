@@ -1,0 +1,160 @@
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix org: <http://example.org/org/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+# Vocabulary definitions
+org:hasPosition a rdf:Property ;
+    rdfs:label "has position" ;
+    rdfs:comment "3D position coordinates for visualization" .
+
+org:belongsToDepartment a rdf:Property ;
+    rdfs:label "belongs to department" ;
+    rdfs:comment "Department membership" .
+
+org:reportsTo a rdf:Property ;
+    rdfs:label "reports to" ;
+    rdfs:comment "Reporting relationship" .
+
+org:manages a rdf:Property ;
+    rdfs:label "manages" ;
+    rdfs:comment "Management relationship" .
+
+org:collaboratesWith a rdf:Property ;
+    rdfs:label "collaborates with" ;
+    rdfs:comment "Collaboration relationship" .
+
+org:hasLevel a rdf:Property ;
+    rdfs:label "has level" ;
+    rdfs:comment "Organizational level" .
+
+# Departments (positioned as layers)
+org:engineering a org:Department ;
+    foaf:name "Engineering" ;
+    org:hasPosition "0,0,0" ;
+    org:belongsToDepartment org:engineering ;
+    org:hasLevel "0" .
+
+org:product a org:Department ;
+    foaf:name "Product" ;
+    org:hasPosition "0,5,0" ;
+    org:belongsToDepartment org:product ;
+    org:hasLevel "5" .
+
+org:design a org:Department ;
+    foaf:name "Design" ;
+    org:hasPosition "0,10,0" ;
+    org:belongsToDepartment org:design ;
+    org:hasLevel "10" .
+
+org:executive a org:Department ;
+    foaf:name "Executive" ;
+    org:hasPosition "0,15,0" ;
+    org:belongsToDepartment org:executive ;
+    org:hasLevel "15" .
+
+# Engineering Department
+org:alice a foaf:Person ;
+    foaf:name "Alice Chen" ;
+    foaf:title "Senior Software Engineer" ;
+    org:belongsToDepartment org:engineering ;
+    org:hasPosition "2.0,0,1.5" .
+
+org:bob a foaf:Person ;
+    foaf:name "Bob Martinez" ;
+    foaf:title "Frontend Developer" ;
+    org:belongsToDepartment org:engineering ;
+    org:hasPosition "1.2,0,-1.8" .
+
+org:charlie a foaf:Person ;
+    foaf:name "Charlie Kim" ;
+    foaf:title "DevOps Engineer" ;
+    org:belongsToDepartment org:engineering ;
+    org:hasPosition "-1.5,0,2.1" .
+
+org:david a foaf:Person ;
+    foaf:name "David Thompson" ;
+    foaf:title "Engineering Manager" ;
+    org:belongsToDepartment org:engineering ;
+    org:hasPosition "0,0,0" .
+
+# Product Department  
+org:elena a foaf:Person ;
+    foaf:name "Elena Rodriguez" ;
+    foaf:title "Product Manager" ;
+    org:belongsToDepartment org:product ;
+    org:hasPosition "1.8,5,-1.2" .
+
+org:frank a foaf:Person ;
+    foaf:name "Frank Wilson" ;
+    foaf:title "Product Analyst" ;
+    org:belongsToDepartment org:product ;
+    org:hasPosition "-2.1,5,1.4" .
+
+org:grace a foaf:Person ;
+    foaf:name "Grace Liu" ;
+    foaf:title "Product Owner" ;
+    org:belongsToDepartment org:product ;
+    org:hasPosition "0.8,5,2.3" .
+
+# Design Department
+org:henry a foaf:Person ;
+    foaf:name "Henry Davis" ;
+    foaf:title "UX Designer" ;
+    org:belongsToDepartment org:design ;
+    org:hasPosition "2.2,10,-0.9" .
+
+org:iris a foaf:Person ;
+    foaf:name "Iris Nakamura" ;
+    foaf:title "UI Designer" ;
+    org:belongsToDepartment org:design ;
+    org:hasPosition "-1.4,10,1.7" .
+
+org:jack a foaf:Person ;
+    foaf:name "Jack Brown" ;
+    foaf:title "Design Manager" ;
+    org:belongsToDepartment org:design ;
+    org:hasPosition "0,10,0" .
+
+# Executive Department
+org:karen a foaf:Person ;
+    foaf:name "Karen Singh" ;
+    foaf:title "VP of Engineering" ;
+    org:belongsToDepartment org:executive ;
+    org:hasPosition "1.5,15,-1.1" .
+
+org:leo a foaf:Person ;
+    foaf:name "Leo Garcia" ;
+    foaf:title "CEO" ;
+    org:belongsToDepartment org:executive ;
+    org:hasPosition "0,15,0" .
+
+# Reporting relationships
+org:alice org:reportsTo org:david .
+org:bob org:reportsTo org:david .
+org:charlie org:reportsTo org:david .
+org:david org:reportsTo org:karen .
+
+org:elena org:reportsTo org:karen .
+org:frank org:reportsTo org:elena .
+org:grace org:reportsTo org:elena .
+
+org:henry org:reportsTo org:jack .
+org:iris org:reportsTo org:jack .
+org:jack org:reportsTo org:leo .
+
+org:karen org:reportsTo org:leo .
+
+# Management relationships  
+org:david org:manages org:alice, org:bob, org:charlie .
+org:elena org:manages org:frank, org:grace .
+org:jack org:manages org:henry, org:iris .
+org:karen org:manages org:david, org:elena .
+org:leo org:manages org:karen, org:jack .
+
+# Collaboration relationships
+org:alice org:collaboratesWith org:elena, org:henry .
+org:bob org:collaboratesWith org:iris .
+org:charlie org:collaboratesWith org:frank .
+org:elena org:collaboratesWith org:alice, org:jack .
+org:henry org:collaboratesWith org:alice, org:elena .
