@@ -193,6 +193,12 @@ export const EXAMPLE_ORG_CHART_MAPPING: VisualizationMapping = {
       rdfProperty: 'http://example.org/org/jobTitle',
       visualAttribute: 'subtitle',
       required: false
+    },
+    {
+      rdfProperty: 'http://example.org/org/hasLevel',
+      visualAttribute: 'height',
+      required: false,
+      transform: (value: string) => parseFloat(value)
     }
   ],
   

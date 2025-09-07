@@ -252,7 +252,11 @@ export class SceneManager {
       const material = this.createNeonMaterial(layer.color, 0.95);
       const mesh = new THREE.Mesh(geometry, material);
       
-      mesh.position.set(node.x, node.y, node.z);
+      // Position node on its layer surface with proper distribution
+      // Use much larger scaling to spread nodes across the full layer surface (16x16 units)
+      const scaledX = Math.max(-7.5, Math.min(7.5, node.x * 3.5)); // Increased scaling for better spread
+      const scaledZ = Math.max(-7.5, Math.min(7.5, node.z * 3.5)); // Increased scaling for better spread
+      mesh.position.set(scaledX, layer.height, scaledZ);
       mesh.userData = node;
       this.scene.add(mesh);
       
